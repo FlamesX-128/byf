@@ -3,11 +3,14 @@ test/
 
 .eslintignore
 .eslintrc.yml
+
 .gitignore
 
 .npmignore
+.npmrc
 
 index.ts
 tsconfig.json
 
+yarn-error.log
 yarn.lock

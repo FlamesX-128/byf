@@ -1,3 +1,7 @@
 node_modules/
 
 index.js
+
+.npmrc
+
+yarn-error.log
