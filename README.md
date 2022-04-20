@@ -28,32 +28,49 @@ Byf should have a config file called 'byf.config.js' with the following:
 
 ```ts
 interface Config {
-  // The main file.
+  /** @type {string} - The main file. */
   entry: string,
 
-  // If you want it to be imported in a different way.
-  // Default is '/(import|require)\('(.*)'\)/'
-  // - Must have a minimum and maximum of 2 containers.
-  // - Basic structure: '/()('(.*)')/'
+  /**
+   * If you want it to be imported in a different way.
+   * - Must have a minimum and maximum of 2 containers.
+   * - Basic structure: '/()('(.*)')/'
+   * 
+   * @type {string} - The main file.
+   * @default /()('(.*)')/
+   */
   importer?: RegExp,
 
-  // File creation options.
+  /** File creation options. */
   output?: {
-
-    // File name.
-    // Default is 'bundle'
+    /**
+     * @type {string | undefined} - File name.
+     * @default 'bundle'
+     */
     filename?: string,
 
-    // Path where the file will be created.
-    // This includes the console path.
+    /**
+     * Path where the file will be created.
+     * This includes the console path.
+     * 
+     * @type {string | undefined}
+     * @default console.cwd()
+     */
     path?: string
   },
-  // Plugin options.
+  
+  /** Plugin options. */
   plugins?: {
-    // Here you add the extensions that must go through this plugin.
+    /**
+     * Here you add the extensions that must go through this plugin.
+     * @type {RegExp | undefined}
+     */
     extention?: RegExp,
 
-    // The plugin handler module or function.
+    /**
+     * The plugin handler module or function.
+     * @type {(string | ((doc: string) => string))[]}
+     */
     use?: (string | ((doc: string) => string))[]
   }[]
 }

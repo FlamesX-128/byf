@@ -16,6 +16,12 @@ interface Config {
   }[]
 }
 
+
+/**
+ * Return a path without the file (index.js).
+ * @param {...Array<string>} dirs - The directories to be joined and evaluated.
+ * @returns {string}
+ */
 function current_directory(...dirs: string[]): string {
   const path = resolve(...dirs)
 
@@ -26,6 +32,14 @@ function current_directory(...dirs: string[]): string {
     : path
 }
 
+
+/**
+ * Returns the file processed by the plugins.
+ * @param {string} file - The file to evaluate.
+ * @param {string} module - Module name.
+ * @param {Config} config - The configuration file.
+ * @returns {Promise<string>}
+ */
 async function render_file(file: string, module: string, config: Config): Promise<string> {
   if (!config.plugins || !config.plugins.length) return file
 
@@ -36,21 +50,38 @@ async function render_file(file: string, module: string, config: Config): Promis
     if (!module.match(extention))
       continue
 
-    return await (async function handler(i: number, toReturn: string): Promise<string> {
-      if (i === config.plugins?.length) return toReturn
+    return await (
+      /**
+       * The function responsible for passing the document through all plugins.
+       * @param {string} doc - The document being processed by the plugins.
+       * @param {number} i - Number of times the function has been executed.
+       * @returns {Promsie<string>} - Returns the document processed by the plugins.
+       */
+      async function handler(doc: string, i: number): Promise<string> {
+        if (i === config.plugins?.length) return doc
 
-      return await handler(
-        (i + 1), (typeof use[i] !== 'string')
-          ? (use[i] as (doc: string) => string)(toReturn)
-          : (await import(module))(toReturn)
-      )
-    })(0, file)
+        return await handler(
+          (typeof use[i] !== 'string')
+            ? (use[i] as (doc: string) => string)(doc)
+            : (await import(module))(doc),
+          (i + 1)
+        )
+      }
+    )(file, 0)
 
   }
 
   return file
 }
 
+
+/**
+ * It is responsible for joining the files into one.
+ * @param {string} file - The file to evaluate.
+ * @param {string} dir - Current directory.
+ * @param {Config} config - The configuration file.
+ * @returns {Promise<string>}
+ */
 async function bundle_files(file: string, dir: string, config: Config): Promise<string> {
   const match = file.match(config.importer || /(import|require)\('(.*)'\)/)
 
@@ -64,7 +95,11 @@ async function bundle_files(file: string, dir: string, config: Config): Promise<
       current_directory(dir, match[2]),
       config
     ),
-    match[2].slice(match[2].lastIndexOf(sep) + 1),
+    match[2].slice(
+      (match[2].lastIndexOf(sep) > -1)
+        ? match[2].lastIndexOf(sep) + 1
+        : 0
+    ),
     config
   )
 
@@ -73,26 +108,33 @@ async function bundle_files(file: string, dir: string, config: Config): Promise<
   )
 }
 
-(async function main(dir: string): Promise<void> {
-  const config: Config = await import(resolve(dir, 'byf.config.js'))
+(
+  /**
+   * The main function.
+   * @param {string} dir - Current directory-
+   * @returns {Promise<void>}
+   */
+  async function main(dir: string): Promise<void> {
+    const config: Config = await import(resolve(dir, 'byf.config.js'))
 
-  if (!config.entry) return
+    if (!config.entry) return
 
-  await writeFile(
-    join(dir,
-      config.output?.path || '',
-      config.output?.filename || 'bundle'
-    ),
-    await bundle_files(
-      await readFile(resolve(dir, config.entry), {
+    await writeFile(
+      join(dir,
+        config.output?.path || '',
+        config.output?.filename || 'bundle'
+      ),
+      await bundle_files(
+        await readFile(resolve(dir, config.entry), {
+          encoding: 'utf-8'
+        }),
+        dir,
+        config
+      ),
+      {
         encoding: 'utf-8'
-      }),
-      dir,
-      config
-    ),
-    {
-      encoding: 'utf-8'
-    }
-  )
+      }
+    )
 
-})(process.cwd())
+  }
+)(process.cwd())
