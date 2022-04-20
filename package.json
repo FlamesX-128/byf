@@ -4,7 +4,7 @@
   "description": "bundle your files",
   "main": "index.ts",
   "bin": {
-    "byf": "dist/index.js"
+    "byf": "index.js"
   },
   "scripts": {
     "build": "tsc",
