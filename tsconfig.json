@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2016",
+
+    /* Modules */
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    /* Emit */
+    "removeComments": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Type Checking */
+    "strict": true,
+    "alwaysStrict": true,
+
+    /* Completeness */
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
+  }
+}

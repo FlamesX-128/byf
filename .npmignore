@@ -1,0 +1,13 @@
+node_modules/
+test/
+
+.eslintignore
+.eslintrc.yml
+.gitignore
+
+.yarnignore
+
+index.ts
+tsconfig.json
+
+yarn.lock
